@@ -14,11 +14,15 @@ class brainDataset(Dataset):
         assert self.mode=='test' or self.mode=='unlabeled'
         self.root = os.path.join(self.root, self.mode)
         self.files = []
+        self.labels = []
 
         self.parse_file()
 
     def __getitem__(self, i):
-        pass
+        img = Image.open(self.files[i])
+        if mode == 'unlabeled':
+            return img
+        return img, self.labels[i]
 
     def __len__(self):
         return len(self.files)
@@ -28,10 +32,13 @@ class brainDataset(Dataset):
             for name in sorted(files):
                 file_path = (os.path.join(root, name))
                 self.files.append(file_path)
+                if self.mode == 'test':
+                    label = int(root.split('/')[-1])
+                    self.labels.append(label)
 
 def test():
-    # dataset = brainDataset(root='./data', mode='test')
-    dataset = brainDataset(root='./data', mode='unlabeled')
+    dataset = brainDataset(root='./data', mode='test')
+    # dataset = brainDataset(root='./data', mode='unlabeled')
 
 if __name__=='__main__':
     test()
