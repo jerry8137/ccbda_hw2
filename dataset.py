@@ -17,6 +17,12 @@ class brainDataset(Dataset):
 
         self.parse_file()
 
+    def __getitem__(self, i):
+        pass
+
+    def __len__(self):
+        return len(self.files)
+
     def parse_file(self):
         for root, dirs, files in sorted(os.walk(self.root)):
             for name in sorted(files):
