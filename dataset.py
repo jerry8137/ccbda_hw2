@@ -14,6 +14,7 @@ class brainDataset(Dataset):
         assert self.mode=='test' or self.mode=='unlabeled'
         self.root = os.path.join(self.root, self.mode)
         self.files = []
+
         self.parse_file()
 
     def parse_file(self):
@@ -21,9 +22,9 @@ class brainDataset(Dataset):
             for name in sorted(files):
                 file_path = (os.path.join(root, name))
                 self.files.append(file_path)
-        print(len(self.files))
 
 def test():
+    # dataset = brainDataset(root='./data', mode='test')
     dataset = brainDataset(root='./data', mode='unlabeled')
 
 if __name__=='__main__':
