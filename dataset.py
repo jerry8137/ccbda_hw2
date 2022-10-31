@@ -4,6 +4,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 
 import os
+from tqdm import tqdm
 
 import ipdb
 
@@ -20,7 +21,7 @@ class brainDataset(Dataset):
 
     def __getitem__(self, i):
         img = Image.open(self.files[i])
-        if mode == 'unlabeled':
+        if self.mode == 'unlabeled':
             return img
         return img, self.labels[i]
 
@@ -37,8 +38,12 @@ class brainDataset(Dataset):
                     self.labels.append(label)
 
 def test():
-    dataset = brainDataset(root='./data', mode='test')
-    # dataset = brainDataset(root='./data', mode='unlabeled')
+    test_dataset = brainDataset(root='./data', mode='test')
+    unlabeled_dataset = brainDataset(root='./data', mode='unlabeled')
+    for i in tqdm(test_dataset):
+        pass
+    for i in tqdm(unlabeled_dataset):
+        pass
 
 if __name__=='__main__':
     test()
