@@ -8,6 +8,16 @@ from tqdm import tqdm
 
 import ipdb
 
+color_jitter = transforms.ColorJitter(0.8, 0.8, 0.8, 0.2)
+
+default_transform = transforms.Compose([
+    transforms.RandomResizedCrop(size=64),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomApply([color_jitter], p=0.8),
+    transforms.RandomGrayscale(p=0.2),
+    transforms.ToTensor(),
+])
+
 class brainDataset(Dataset):
     def __init__(self, root, mode):
         self.root = root
@@ -21,6 +31,7 @@ class brainDataset(Dataset):
 
     def __getitem__(self, i):
         img = Image.open(self.files[i])
+        img = default_transform(img)
         if self.mode == 'unlabeled':
             return img
         return img, self.labels[i]
@@ -44,6 +55,8 @@ def test():
         pass
     for i in tqdm(unlabeled_dataset):
         pass
+
+    print(test_dataset[0][0].shape)
 
 if __name__=='__main__':
     test()

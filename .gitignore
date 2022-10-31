@@ -3,3 +3,5 @@ data/*
 *.npy
 
 *.zip
+
+__pycache__/*
