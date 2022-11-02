@@ -110,7 +110,7 @@ def main():
     wandb_logger = WandbLogger(project='SimCLR')
     checkpoint_callback = ModelCheckpoint(
         dirpath='./ckpt',
-        filename=hparams.exp_name+'-{epoch}--{val_accuracy:.2f}',
+        filename=hparams.exp_name+'/{epoch}-{val_accuracy:.2f}',
         monitor='val/accuracy',
         mode='max',
         save_top_k=5,
