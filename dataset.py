@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from PIL import Image
+from gaussian_blur import GaussianBlur
 
 import os
 from tqdm import tqdm
@@ -9,7 +10,6 @@ from tqdm import tqdm
 color_jitter = transforms.ColorJitter(0.8, 0.8, 0.8, 0.2)
 
 default_transform = transforms.Compose([
-    transforms.Resize((64, 64)),
     transforms.ToTensor(),
 ])
 
@@ -18,6 +18,7 @@ augment_transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomApply([color_jitter], p=0.8),
     transforms.RandomGrayscale(p=0.2),
+    GaussianBlur(kernel_size=int(0.1*64)),
     transforms.ToTensor(),
 ])
 
@@ -36,7 +37,7 @@ class brainDataset(Dataset):
     def __getitem__(self, i):
         img = Image.open(self.files[i])
         if self.mode == 'unlabeled':
-            return default_transform(img), augment_transform(img)
+            return augment_transform(img), augment_transform(img)
         return default_transform(img), self.labels[i]
 
     def __len__(self):

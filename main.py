@@ -78,6 +78,7 @@ class SimCLR(pl.LightningModule):
         log['loss'] = loss = self.loss(output, aug_output)
         self.log('train/loss', loss)
         self.log('lr', log['lr'])
+        return log
 
     def validation_step(self, batch, batch_idx):
         input, label = batch
