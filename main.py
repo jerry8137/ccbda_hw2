@@ -78,7 +78,10 @@ class SimCLR(pl.LightningModule):
         log['loss'] = loss = self.loss(output, aug_output)
         self.log('train/loss', loss)
         self.log('lr', log['lr'])
-        return log
+        return loss
+
+    def training_epoch_end(self, outputs):
+        pass
 
     def validation_step(self, batch, batch_idx):
         input, label = batch
@@ -92,6 +95,7 @@ class SimCLR(pl.LightningModule):
             [x['_val_acc'] for x in outputs]
         ).mean()
         self.log('val/accuracy', mean_acc, prog_bar=True)
+        self.log('val_accuracy', mean_acc, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
         pass
@@ -106,7 +110,7 @@ def main():
     wandb_logger = WandbLogger(project='SimCLR')
     checkpoint_callback = ModelCheckpoint(
         dirpath='./ckpt',
-        filename=hparams.exp_name+'-{epoch}--{val/accuracy:.2f}',
+        filename=hparams.exp_name+'-{epoch}--{val_accuracy:.2f}',
         monitor='val/accuracy',
         mode='max',
         save_top_k=5,

@@ -10,16 +10,16 @@ def get_opts():
     parser.add_argument('--batch_size', type=int,
                         default=2048)
     parser.add_argument('--num_epoch', type=int,
-                        default=100)
+                        default=1000)
     parser.add_argument('--num_workers', type=int,
                         default=8)
     # model param
     parser.add_argument('--num_class', type=int,
-                        default=4)
+                        default=128)
     parser.add_argument('--hidden_size', type=int,
                         default=512)
     parser.add_argument('--weight_decay', type=float,
-                        default=1e-4)
+                        default=0)
 
     parser.add_argument('--weight', type=str,
                         default=None)
