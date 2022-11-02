@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
-import argparse
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -13,6 +11,7 @@ from dataset import brainDataset
 from resnet_simclr import ResNetSimCLR
 from loss import nt_xent
 from knn import KNN
+from utils import get_opts
 
 import ipdb
 
@@ -21,8 +20,8 @@ class SimCLR(pl.LightningModule):
     def __init__(self, hparams):
         super(SimCLR, self).__init__()
         self.save_hyperparameters(hparams)
-        self.model = ResNetSimCLR(hidden_dim=512, out_dim=512)
-        self.loss = nt_xent()
+        self.model = ResNetSimCLR(out_dim=128)
+        self.loss = nt_xent
 
     def setup(self, stage):
         self.train_dataset = brainDataset(root=self.hparams.root_dir,
@@ -35,7 +34,7 @@ class SimCLR(pl.LightningModule):
 
         return out
 
-    def configure_optimizer(self):
+    def configure_optimizers(self):
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             self.hparams.lr,
@@ -43,12 +42,12 @@ class SimCLR(pl.LightningModule):
         )
         self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer,
-            T_max=len(self.train_dataloader),
+            T_max=len(self.train_dataloader()),
             eta_min=0,
             last_epoch=-1
         )
 
-        return [self.optimizer], [self.lr_scheduler]
+        return [self.optimizer], [self.scheduler]
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset,
@@ -73,24 +72,24 @@ class SimCLR(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         log = {'lr': (self.optimizer).param_groups[0]['lr']}
-        input = batch
-        embedding = self(input)
-        log['loss'] = loss = self.loss(embedding, input)
+        input, aug_input = batch
+        embedding, output = self(input)
+        aug_embedding, aug_output = self(aug_input)
+        log['loss'] = loss = self.loss(output, aug_output)
         self.log('train/loss', loss)
         self.log('lr', log['lr'])
 
     def validation_step(self, batch, batch_idx):
         input, label = batch
-        embedding = self(input)
-        acc = KNN(embedding, label, batch_size=len(label))
+        embedding, _ = self(input)
+        acc = KNN(embedding, label, batch_size=512)
         log = {'_val_acc': acc}
         return log
 
     def validation_epoch_end(self, outputs):
-        mean_acc = torch.cat(
-            [x['val_acc'] for x in outputs],
-            dim=0
-        ).to(torch.float).mean().item()
+        mean_acc = np.array(
+            [x['_val_acc'] for x in outputs]
+        ).mean()
         self.log('val/accuracy', mean_acc, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
@@ -101,7 +100,7 @@ class SimCLR(pl.LightningModule):
 
 
 def main():
-    hparams = get_ops()
+    hparams = get_opts()
     system = SimCLR(hparams)
     wandb_logger = WandbLogger(project='SimCLR')
     checkpoint_callback = ModelCheckpoint(
@@ -121,5 +120,5 @@ def main():
                 ckpt_path=hparams.weight)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

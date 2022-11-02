@@ -1,4 +1,3 @@
-import torch
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from PIL import Image
@@ -6,11 +5,15 @@ from PIL import Image
 import os
 from tqdm import tqdm
 
-import ipdb
 
 color_jitter = transforms.ColorJitter(0.8, 0.8, 0.8, 0.2)
 
 default_transform = transforms.Compose([
+    transforms.Resize((64, 64)),
+    transforms.ToTensor(),
+])
+
+augment_transform = transforms.Compose([
     transforms.RandomResizedCrop(size=64),
     transforms.RandomHorizontalFlip(),
     transforms.RandomApply([color_jitter], p=0.8),
@@ -18,11 +21,12 @@ default_transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+
 class brainDataset(Dataset):
     def __init__(self, root, mode):
         self.root = root
         self.mode = mode
-        assert self.mode=='test' or self.mode=='unlabeled'
+        assert self.mode == 'test' or self.mode == 'unlabeled'
         self.root = os.path.join(self.root, self.mode)
         self.files = []
         self.labels = []
@@ -31,10 +35,9 @@ class brainDataset(Dataset):
 
     def __getitem__(self, i):
         img = Image.open(self.files[i])
-        img = default_transform(img)
         if self.mode == 'unlabeled':
-            return img
-        return img, self.labels[i]
+            return default_transform(img), augment_transform(img)
+        return default_transform(img), self.labels[i]
 
     def __len__(self):
         return len(self.files)
@@ -48,6 +51,7 @@ class brainDataset(Dataset):
                     label = int(root.split('/')[-1])
                     self.labels.append(label)
 
+
 def test():
     test_dataset = brainDataset(root='./data', mode='test')
     unlabeled_dataset = brainDataset(root='./data', mode='unlabeled')
@@ -58,5 +62,6 @@ def test():
 
     print(test_dataset[0][0].shape)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     test()
