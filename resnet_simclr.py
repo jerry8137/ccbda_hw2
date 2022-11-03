@@ -4,7 +4,7 @@ import torchvision.models as models
 class ResNetSimCLR(nn.Module):
     def __init__(self, out_dim):
         super(ResNetSimCLR, self).__init__()
-        self.resnet = models.resnet18(pretrained=False, num_classes=512)
+        self.resnet = models.resnet50(pretrained=False, num_classes=512)
 
         # add projection head
         self.projection = nn.Sequential(nn.BatchNorm1d(512),

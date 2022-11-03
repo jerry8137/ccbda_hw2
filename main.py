@@ -132,6 +132,7 @@ def main():
             callbacks=[checkpoint_callback],
             logger=wandb_logger,
             gpus=1,
+            log_every_n_steps=1,
         )
         trainer.fit(system,
                     ckpt_path=hparams.weight)
