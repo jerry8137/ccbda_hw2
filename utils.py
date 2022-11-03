@@ -17,7 +17,7 @@ def get_opts():
     parser.add_argument('--num_class', type=int,
                         default=128)
     parser.add_argument('--hidden_size', type=int,
-                        default=512)
+                        default=128)
     parser.add_argument('--weight_decay', type=float,
                         default=0)
 

@@ -20,7 +20,7 @@ class SimCLR(pl.LightningModule):
     def __init__(self, hparams):
         super(SimCLR, self).__init__()
         self.save_hyperparameters(hparams)
-        self.model = ResNetSimCLR(out_dim=128)
+        self.model = ResNetSimCLR(out_dim=hparams.hidden_size)
         self.loss = nt_xent
 
     def setup(self, stage):
