@@ -133,6 +133,7 @@ def main():
             logger=wandb_logger,
             gpus=1,
             log_every_n_steps=1,
+            accumulate_grad_batches=hparams.accumulate,
         )
         trainer.fit(system,
                     ckpt_path=hparams.weight)

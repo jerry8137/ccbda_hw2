@@ -20,6 +20,8 @@ def get_opts():
                         default=128)
     parser.add_argument('--weight_decay', type=float,
                         default=0)
+    parser.add_argument('--accumulate', type=int,
+                        default=1)
 
     parser.add_argument('--weight', type=str,
                         default=None)
