@@ -28,6 +28,9 @@ class SimCLR(pl.LightningModule):
                                           mode='unlabeled')
         self.val_dataset = brainDataset(root=self.hparams.root_dir,
                                         mode='test')
+        self.test_dataset = brainDataset(root=self.hparams.root_dir,
+                                         mode='unlabeled',
+                                         gen=True)
 
     def forward(self, x):
         out = self.model(x)
@@ -64,7 +67,7 @@ class SimCLR(pl.LightningModule):
                           num_workers=self.hparams.num_workers)
 
     def test_dataloader(self):
-        return DataLoader(self.train_dataset,
+        return DataLoader(self.test_dataset,
                           batch_size=self.hparams.batch_size,
                           pin_memory=True,
                           shuffle=False,
@@ -98,10 +101,12 @@ class SimCLR(pl.LightningModule):
         self.log('val_accuracy', mean_acc, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
-        pass
+        embedding, _ = self(batch)
+        return embedding
 
     def test_epoch_end(self, outputs):
-        pass
+        embedding = torch.cat(outputs).cpu().detach().numpy()
+        np.save('311511035.npy', embedding)
 
 
 def main():
@@ -115,14 +120,21 @@ def main():
         mode='max',
         save_top_k=5,
     )
-    trainer = pl.Trainer(
-        max_epochs=hparams.num_epoch,
-        callbacks=[checkpoint_callback],
-        logger=wandb_logger,
-        gpus=1,
-    )
-    trainer.fit(system,
-                ckpt_path=hparams.weight)
+    if hparams.test:
+        trainer = pl.Trainer(
+            gpus=1
+        )
+        trainer.test(system,
+                     ckpt_path=hparams.weight)
+    else:
+        trainer = pl.Trainer(
+            max_epochs=hparams.num_epoch,
+            callbacks=[checkpoint_callback],
+            logger=wandb_logger,
+            gpus=1,
+        )
+        trainer.fit(system,
+                    ckpt_path=hparams.weight)
 
 
 if __name__ == '__main__':

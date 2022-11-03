@@ -24,10 +24,11 @@ augment_transform = transforms.Compose([
 
 
 class brainDataset(Dataset):
-    def __init__(self, root, mode, cache=True):
+    def __init__(self, root, mode, cache=True, gen=False):
         self.root = root
         self.mode = mode
         self.cache = cache
+        self.gen = gen
         assert self.mode == 'test' or self.mode == 'unlabeled'
         self.root = os.path.join(self.root, self.mode)
         self.files = []
@@ -43,6 +44,8 @@ class brainDataset(Dataset):
         else:
             img = Image.open(self.files[i])
         if self.mode == 'unlabeled':
+            if self.gen == True:
+                return default_transform(img)
             return augment_transform(img), augment_transform(img)
         return default_transform(img), self.labels[i]
 
@@ -58,7 +61,7 @@ class brainDataset(Dataset):
                     label = int(root.split('/')[-1])
                     self.labels.append(label)
 
-    def cache(self):
+    def cache_image(self):
         self.images = [Image.open(path).copy() for path in tqdm(self.files)]
 
 

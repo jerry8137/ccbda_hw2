@@ -9,3 +9,5 @@ __pycache__/*
 ckpt/*
 
 wandb/*
+
+lightning_logs/*
