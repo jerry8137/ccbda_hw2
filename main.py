@@ -45,7 +45,7 @@ class SimCLR(pl.LightningModule):
         )
         self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer,
-            T_max=len(self.train_dataloader()),
+            T_max=len(self.train_dataloader())*self.hparams.accumulate,
             eta_min=0,
             last_epoch=-1
         )
