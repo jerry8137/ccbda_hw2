@@ -8,6 +8,14 @@ To install dependencies:
 
 `pip install -r requirements.txt`
 
+The data directory should be arranged as:
+
+```shell
+data
+├── test
+└── unlabeled
+```
+
 To train:
 
 ```shell
