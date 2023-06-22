@@ -129,7 +129,7 @@ toml==0.10.2
 torch==1.10.0.dev20210621+cu102
 torchmetrics==0.8.2
 torchvision==0.11.0.dev20210621+cu102
-tornado==6.1
+tornado==6.3.2
 tqdm==4.61.1
 traitlets==4.3.3
 typing==3.7.4.3
